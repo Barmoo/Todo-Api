@@ -1,22 +1,14 @@
 import express from 'express';
+import todoRouter from './routes/todo.js';
 //create an express app
 
 const app = express();
-//Define routes
-app.get('/hello', (req, res, next)=> {
-    console.log(req.headers);
-    res.json('You visited the hello endpoint');
-});
-
-app.get('/goodbye', function (req,res,next){
-    console.log(req.query);
-    res.json('Same to you')
-    
-});
+//use routes
+app.use(todoRouter);
 
 //listen for incoming requests
 
-app.listen(3000, function () {
+app.listen(3000, ()=> {
     console.log('App is listening on port 3000');
 
 });
