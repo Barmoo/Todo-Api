@@ -1,6 +1,6 @@
 //register,login,logout
 
-import { registerUserValidator, loginUserValidator } from "../validators/user.js";
+import { registerUserValidator, loginUserValidator, updateProfileValidators } from "../validators/user.js";
 import { UserModel } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -19,7 +19,7 @@ export const registerUser = async(req, res, next) => {
         }
         //harsh their password
         const hashedPassword = bcrypt.hashSync(value.password, 10);
-        //save the user into dsatabase
+        //save the user into database
         await UserModel.create({
             ...value,
             password: hashedPassword
@@ -70,13 +70,35 @@ export const loginUser = async(req, res, next) => {
     }
 }
 
-export const getProfile = (req,res,next)=>{
-    res.json('User profile');
-}
+export const getProfile = async(req,res,next)=>{
+   try {
+    console.log(req.auth);
+    // Find authenticated user from database
+    const user = await UserModel
+    .findById(req.auth.id)
+    .select({password: false});
+    // Respond to request
+     res.json(user);
+    
+   } catch (error) {
+    next(error);
+   }
+   }
 
 export const logoutUser = (req, res, next) => {
     res.json('user logged out');
 }
 export const updateProfile = (req, res, next) => {
-    res.json('user profile  updated');
-}
+   try {
+    //validate user input
+    const {error,value } = updateProfileValidators.validate(req.body);
+    if (error){
+        return res.status(422).json(error);
+    }
+    
+     res.json('user profile  updated');
+ }
+    catch (error) {
+        next(error);
+    }
+   }
